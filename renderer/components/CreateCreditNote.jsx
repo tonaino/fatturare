@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Banknote } from 'lucide-react';
 
 export const CreateCreditNote = ({ editId, onComplete }) => {
   const { t } = useTranslation();
@@ -28,6 +29,9 @@ export const CreateCreditNote = ({ editId, onComplete }) => {
   const [newProductPrice, setNewProductPrice] = useState('');
   const [newProductUnit, setNewProductUnit] = useState('pcs');
   const [showProductModal, setShowProductModal] = useState(false);
+  const [showVatCalculator, setShowVatCalculator] = useState(false);
+  const [currentVatItemIndex, setCurrentVatItemIndex] = useState(null);
+  const [grossPriceInput, setGrossPriceInput] = useState('');
 
   useEffect(() => {
     loadInitialData();
@@ -281,6 +285,28 @@ export const CreateCreditNote = ({ editId, onComplete }) => {
     }
   };
 
+  const openVatCalculator = (index) => {
+    setCurrentVatItemIndex(index);
+    setGrossPriceInput('');
+    setShowVatCalculator(true);
+  };
+
+  const applyGrossPrice = () => {
+    if (currentVatItemIndex === null || grossPriceInput === '') return;
+
+    const grossPrice = parseFloat(grossPriceInput);
+    if (isNaN(grossPrice)) return;
+
+    const vatRate = parseFloat(formData.vat_rate) || 0;
+    const netPrice = grossPrice / (1 + (vatRate / 100));
+
+    handleItemChange(currentVatItemIndex, 'price', netPrice.toFixed(2));
+
+    setShowVatCalculator(false);
+    setCurrentVatItemIndex(null);
+    setGrossPriceInput('');
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -508,15 +534,25 @@ export const CreateCreditNote = ({ editId, onComplete }) => {
                           />
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <input
-                            type="number"
-                            value={item.price}
-                            onChange={(e) => handleItemChange(index, 'price', e.target.value)}
-                            className="form-input block w-full sm:text-sm"
-                            min="0"
-                            step="0.01"
-                            placeholder="0.00"
-                          />
+                          <div className="relative flex items-center">
+                            <input
+                              type="number"
+                              value={item.price}
+                              onChange={(e) => handleItemChange(index, 'price', e.target.value)}
+                              className="form-input block w-full pr-8 sm:text-sm"
+                              min="0"
+                              step="0.01"
+                              placeholder="0.00"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => openVatCalculator(index)}
+                              className="absolute right-2 p-1 text-gray-400 hover:text-blue-500"
+                              title="Calculate from gross price"
+                            >
+                              <Banknote size={16} />
+                            </button>
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">
@@ -682,6 +718,63 @@ export const CreateCreditNote = ({ editId, onComplete }) => {
                 <button
                   type="button"
                   onClick={() => setShowProductModal(false)}
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* VAT Calculator Modal */}
+      {showVatCalculator && (
+        <div className="fixed z-20 inset-0 overflow-y-auto">
+          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 transition-opacity" aria-hidden="true" onClick={() => setShowVatCalculator(false)}>
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4 flex items-center">
+                  <Banknote className="mr-2" size={20} />
+                  VAT-Inclusive Calculator
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="gross_price" className="block text-sm font-medium text-gray-700">
+                      Gross Price (EUR)
+                    </label>
+                    <div className="mt-1">
+                      <input
+                        type="number"
+                        id="gross_price"
+                        className="form-input block w-full sm:text-sm"
+                        value={grossPriceInput}
+                        onChange={(e) => setGrossPriceInput(e.target.value)}
+                        placeholder="0.00"
+                        autoFocus
+                        onKeyDown={(e) => e.key === 'Enter' && applyGrossPrice()}
+                      />
+                    </div>
+                    <p className="mt-2 text-xs text-gray-500">
+                      VAT Rate Used: {formData.vat_rate}%
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  onClick={applyGrossPrice}
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  Apply
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowVatCalculator(false)}
                   className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                 >
                   Cancel
