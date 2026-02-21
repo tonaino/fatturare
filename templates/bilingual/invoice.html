@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{doc_number}}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      font-size: 12px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .company-info, .customer-info {
+      width: 45%;
+    }
+    .info-box {
+      margin-bottom: 15px;
+    }
+    .info-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+      text-decoration: underline;
+    }
+    .invoice-title {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin: 20px 0;
+      text-transform: uppercase;
+    }
+    .invoice-details {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .details-box {
+      width: 30%;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    .table th, .table td {
+      border: 1px solid #000;
+      padding: 8px;
+      text-align: left;
+    }
+    .table th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+    .totals {
+      width: 30%;
+      margin-left: 70%;
+    }
+    .totals-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .totals-table th, .totals-table td {
+      border: 1px solid #000;
+      padding: 5px;
+    }
+    .totals-table th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+    .signature-section {
+      margin-top: 50px;
+    }
+    .signature-line {
+      margin-top: 40px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .signature {
+      width: 40%;
+      text-align: center;
+    }
+    .bilingual-label {
+      display: flex;
+      justify-content: space-between;
+    }
+    .bilingual-label span:first-child {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <!-- Watermark -->
+  <div class="watermark">{{watermark_text}}</div>
+
+  <div class="invoice-header">
+    <div class="invoice-title bilingual-label">
+      <span>{{#if isProforma}}PROFORMA INVOICE / ПРОФОРМА ФАКТУРА{{else}}INVOICE / ФАКТУРА{{/if}}</span>
+    </div>
+    <div class="invoice-info">
+      <div><strong>{{#if isProforma}}Proforma Invoice No. / Проформа фактура №:{{else}}Invoice No. / Фактура №:{{/if}}</strong> {{clean_doc_number}}</div>
+      <div><strong>Date of Invoice / Дата на фактура:</strong> {{issue_date}}</div>
+    </div>
+  </div>
+
+  <style>
+    .watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      font-size: 120px;
+      font-weight: bold;
+      color: rgba(0, 0, 0, 0.1); /* 10% opacity */
+      pointer-events: none;
+      z-index: -1;
+      white-space: nowrap;
+    }
+    .invoice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    .invoice-title {
+      font-size: 24px;
+      font-weight: bold;
+      text-transform: uppercase;
+      flex-grow: 1;
+    }
+    .invoice-info {
+      text-align: right;
+      min-width: 200px;
+    }
+    .boxed-info {
+      border: 1px solid #000;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 15px;
+    }
+    .boxed-info .info-title {
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #ccc;
+    }
+  </style>
+
+  <div class="content-wrapper">
+    <div class="info-sections">
+      <div class="boxed-info company-info">
+        <div class="info-title bilingual-label">
+          <span>Supplier / Продавач:</span>
+        </div>
+        <div>{{company.name}}</div>
+        <div>UIC / ЕИК: {{company.bulstat}}</div>
+        <div>VAT ID / ДДС: {{company.vat_id}}</div>
+        <div>{{company.address}}</div>
+        <div>Accountable Person / МОЛ: {{company.mol}}</div>
+      </div>
+
+      <div class="boxed-info customer-info">
+        <div class="info-title bilingual-label">
+          <span>Customer / Купувач:</span>
+        </div>
+        <div>{{customer.name}}</div>
+        <div>UIC / ЕИК: {{customer.bulstat}}</div>
+        <div>VAT ID / ДДС: {{customer.vat_id}}</div>
+        <div>{{customer.address}}</div>
+        <div>Accountable Person / МОЛ: {{customer.mol}}</div>
+      </div>
+    </div>
+
+    <div class="invoice-details">
+      <div class="details-box">
+        <div><strong>Date of Tax Event / Дата на данъчно събитие:</strong> {{tax_event_date}}</div>
+        {{#if reason}}
+          <div><strong>Tax Exemption / Correction Reason / Причина за освобождаване от ДДС / Корекция:</strong> {{reason}}</div>
+        {{/if}}
+      </div>
+      <div class="details-box">
+        <div><strong>Payment Method / Начин на плащане:</strong> {{payment_method}}</div>
+      </div>
+    </div>
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>№</th>
+        <th>Product/Service / Артикул/Услуга</th>
+        <th>Quantity / Количество</th>
+        <th>Unit / Мярка</th>
+        <th>Unit Price / Единична цена</th>
+        <th>Value / Стойност</th>
+        <th>VAT % / ДДС %</th>
+        <th>VAT Amount / Сума ДДС</th>
+        <th>Total / Общо</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each items}}
+      <tr>
+        <td>{{add @index 1}}</td>
+        <td>{{name}}</td>
+        <td>{{qty}}</td>
+        <td>{{unit_localized}}</td>
+        <td>{{formatCurrency price}}</td>
+        <td>{{formatCurrency total_net}}</td>
+        <td>{{../vat_rate}}%</td>
+        <td>{{formatCurrency total_vat}}</td>
+        <td>{{formatCurrency total}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <div class="totals">
+    <table class="totals-table">
+      <tr>
+        <th>Type of Goods/Service / Вид на стоката/услугата</th>
+        <th>Amount / Сума</th>
+      </tr>
+      <tr>
+        <td>Net Amount / Нетна сума:</td>
+        <td>{{formatCurrency total_net}}</td>
+      </tr>
+      {{#if reason}}
+        <tr>
+          <td>VAT {{vat_rate}}% ({{reason}}) / ДДС {{vat_rate}}% ({{reason}}):</td>
+          <td>{{formatCurrency total_vat}}</td>
+        </tr>
+      {{else}}
+        <tr>
+          <td>VAT {{vat_rate}}% / ДДС {{vat_rate}}%:</td>
+          <td>{{formatCurrency total_vat}}</td>
+        </tr>
+      {{/if}}
+      <tr>
+        <td><strong>Total Amount / Обща сума:</strong></td>
+        <td><strong>{{formatCurrency total_gross}}</strong></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="signature-section">
+    {{#if reason}}
+      <div class="info-box">
+        <div class="info-title bilingual-label">
+          <span>Tax Exemption Details / Данъчни освобождения:</span>
+        </div>
+        <div>This invoice is issued with 0% VAT rate based on: {{reason}}</div>
+      </div>
+    {{/if}}
+    <div class="info-box">
+      <div class="info-title bilingual-label">
+        <span>Bank Account / Банкова сметка:</span>
+      </div>
+      <div>Bank / Банка: {{company.bank_name}}</div>
+      <div>IBAN: {{company.iban}}</div>
+      <div>BIC: {{company.bic}}</div>
+    </div>
+    
+    <div class="signature-line">
+      <div class="signature">
+        <div>_______________</div>
+        <div>Signature & Stamp / Подпис и печат</div>
+      </div>
+      <div class="signature">
+        <div>_______________</div>
+        <div>Accountable Person / МОЛ</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

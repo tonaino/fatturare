@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{doc_number}}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      font-size: 12px;
+    }
+    .watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      font-size: 120px;
+      font-weight: bold;
+      color: rgba(0, 0, 0, 0.1); /* 10% opacity */
+      pointer-events: none;
+      z-index: -1;
+      white-space: nowrap;
+    }
+    .invoice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    .invoice-title {
+      font-size: 24px;
+      font-weight: bold;
+      text-transform: uppercase;
+      flex-grow: 1;
+    }
+    .invoice-info {
+      text-align: right;
+      min-width: 200px;
+    }
+    .boxed-info {
+      border: 1px solid #000;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 15px;
+    }
+    .boxed-info .info-title {
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #ccc;
+    }
+    .info-sections {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .info-sections > div {
+      flex: 1; /* Equal width for both boxes */
+    }
+    .invoice-details {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .details-box {
+      width: 50%;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    .table th, .table td {
+      border: 1px solid #000;
+      padding: 8px;
+      text-align: left;
+    }
+    .table th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+    .totals {
+      width: 40%;
+      margin-left: 60%;
+    }
+    .totals-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .totals-table th, .totals-table td {
+      border: 1px solid #000;
+      padding: 5px;
+    }
+    .totals-table th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+    .signature-section {
+      margin-top: 50px;
+    }
+    .signature-line {
+      margin-top: 40px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .signature {
+      width: 40%;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <!-- Watermark -->
+  <div class="watermark">{{watermark_text}}</div>
+
+  <div class="invoice-header">
+    <div class="invoice-title">{{#if isProforma}}ПРОФОРМА ФАКТУРА{{else}}ФАКТУРА{{/if}}</div>
+    <div class="invoice-info">
+      <div><strong>{{#if isProforma}}Проформа фактура №:{{else}}Фактура №:{{/if}}</strong> {{clean_doc_number}}</div>
+      <div><strong>Дата на фактура:</strong> {{issue_date}}</div>
+    </div>
+  </div>
+
+
+  <div class="content-wrapper">
+    <div class="info-sections">
+      <div class="boxed-info customer-info">
+        <div class="info-title">Получател:</div>
+        <div>{{customer.name}}</div>
+        <div>ЕИК: {{customer.bulstat}}</div>
+        <div>ДДС: {{customer.vat_id}}</div>
+        <div>{{customer.address}}</div>
+        <div>МОЛ: {{customer.mol}}</div>
+      </div>
+
+      <div class="boxed-info company-info">
+        <div class="info-title">Доставчик:</div>
+        <div>{{company.name}}</div>
+        <div>ЕИК: {{company.bulstat}}</div>
+        <div>ДДС: {{company.vat_id}}</div>
+        <div>{{company.address}}</div>
+        <div>МОЛ: {{company.mol}}</div>
+      </div>
+    </div>
+
+    <div class="invoice-details">
+      <div class="details-box">
+        <div><strong>Дата на данъчно събитие:</strong> {{tax_event_date}}</div>
+        {{#if reason}}
+          <div><strong>Причина за освобождаване от ДДС / Корекция:</strong><br \> {{reason}}</div>
+        {{/if}}
+      </div>
+      <div class="details-box">
+        <div><strong>Начин на плащане:</strong> {{payment_method}}</div>
+        <div><strong>Място на сделката:</strong> Негушево, Валентина Бевакуа ЕООД</div>
+      </div>
+    </div>
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th style="width: 5%;">№</th>
+        <th style="width: 30%;">Вид на стоката/услугата</th>
+        <th style="width: 8%;">Мярка</th>
+        <th style="width: 8%;">Количество</th>       
+        <th style="width: 10%;">Единична цена</th>
+        <th style="width: 10%;">Стойност</th>
+        <!--th style="width: 8%;">ДДС %</th>
+        <th style="width: 10%;">Сума ДДС</th-->
+        <th style="width: 10%;">Общо</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each items}}
+      <tr>
+        <td>{{add @index 1}}</td>
+        <td>{{name}}</td>
+        <td>{{unit_localized}}</td>
+        <td>{{qty}}</td>
+        <td>{{formatCurrency price}}</td>
+        <td>{{formatCurrency total_net}}</td>
+        <!--td>{{../vat_rate}}%</td>
+        <td>{{formatCurrency total_vat}}</td-->
+        <td>{{formatCurrency total}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <div class="totals">
+    <table class="totals-table">
+      <tr>
+        <th style="width: 70%;"></th>
+        <th style="width: 30%;"></th>
+      </tr>
+      <tr>
+        <td>Данъчна основа:</td>
+        <td>{{formatCurrency total_net}}</td>
+      </tr>
+      {{#if reason}}
+        <tr>
+          <td>ДДС {{vat_rate}}% ({{reason}}):</td>
+          <td>{{formatCurrency total_vat}}</td>
+        </tr>
+      {{else}}
+        <tr>
+          <td>ДДС {{vat_rate}}%:</td>
+          <td>{{formatCurrency total_vat}}</td>
+        </tr>
+      {{/if}}
+      <tr>
+        <td><strong>Сума за плащане:</strong></td>
+        <td><strong>{{formatCurrency total_gross}}</strong></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="signature-section">
+    {{#if reason}}
+      <div class="info-box">
+        <div class="info-title">Данъчни освобождения:</div>
+        <div>Тази фактура е издадена с 0% ДДС според: {{reason}}</div>
+      </div>
+    {{/if}}
+    <div class="boxed-info info-box" style="width: 40%;">
+      <div class="info-title">Банкова сметка:</div>
+      <div>Банка: {{company.bank_name}}</div>
+      <div>IBAN: {{company.iban}}</div>
+      <div>BIC: {{company.bic}}</div>
+    </div>
+    
+    <div class="signature-line">
+      <div class="signature">
+        <div>Получил</div>
+        <div>{{customer.mol}}</div>       
+      </div>
+      <div class="signature">
+        <div>Съставил</div>
+        <div>Валентина Бевакуа</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

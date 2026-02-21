@@ -1,0 +1,79 @@
+{
+  "name": "fatturare",
+  "version": "1.0.2",
+  "description": "Bulgarian VAT-compliant invoicing application for macOS",
+  "main": "main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "concurrently \"npm run dev-renderer\" \"cross-env NODE_ENV=development electron .\"",
+    "build": "npm run reset-db && npm run build-renderer && electron-builder",
+    "pack": "npm run reset-db && npm run build-renderer && electron-builder --dir",
+    "build-renderer": "vite build",
+    "dev-renderer": "vite --host",
+    "build-css": "npx tailwindcss -i ./renderer/index.css -o ./renderer/output.css --minify",
+    "watch-css": "npx tailwindcss -i ./renderer/index.css -o ./renderer/output.css --watch",
+    "postinstall": "electron-builder install-app-deps",
+    "reset-db": "node scripts/reset-db.js"
+  },
+  "keywords": [
+    "electron",
+    "invoice",
+    "bulgaria",
+    "vat",
+    "accounting"
+  ],
+  "author": "Open Source Contributor",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.2",
+    "autoprefixer": "^10.4.23",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^28.3.3",
+    "electron-builder": "^24.0.0",
+    "electron-rebuild": "^3.2.9",
+    "postcss": "^8.5.6",
+    "vite": "^7.3.0"
+  },
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-slot": "^1.2.4",
+    "better-sqlite3": "^12.6.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "electron-squirrel-startup": "^1.0.1",
+    "handlebars": "^4.7.8",
+    "i18next": "^25.7.3",
+    "i18next-browser-languagedetector": "^8.2.0",
+    "lucide-react": "^0.562.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-i18next": "^16.5.0",
+    "tailwind-merge": "^3.4.0",
+    "tailwindcss": "^3.4.19",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "build": {
+    "appId": "com.github.fatturare",
+    "productName": "Fatturare",
+    "directories": {
+      "buildResources": "assets"
+    },
+    "files": [
+      "main/**/*",
+      "preload.js",
+      "templates/**/*",
+      "dist/renderer/**/*",
+      "!**/*.map",
+      "node_modules/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.business",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    }
+  }
+}

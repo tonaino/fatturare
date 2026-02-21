@@ -1,0 +1,35 @@
+Total keys in English: 244
+Total keys in Bulgarian: 219
+
+=== Keys in English but missing in Bulgarian ===
+messages.actions: "Actions"
+messages.adjustSearch: "Try adjusting your search terms or clearing the filters to see more documents"
+messages.cancel: "Cancel"
+messages.clear: "Clear"
+messages.clearSearchFilters: "Clear search & filters"
+messages.createInvoice: "Create Invoice"
+messages.createToGetStarted: "Create invoices and credit notes to get started with your business paperwork"
+messages.customer: "Customer"
+messages.date: "Date"
+messages.documentsTitle: "Documents"
+messages.editDocument: "Edit document"
+messages.exportDocumentsModalTitle: "Export Documents by Month"
+messages.exportMonth: "Export Month"
+messages.exportSelected: "Export Selected"
+messages.markAsPaid: "Mark as paid"
+messages.month: "Month"
+messages.noDocumentsForPeriod: "No documents found for the selected month/year."
+messages.noDocumentsMatchSearch: "No documents match your search"
+messages.noDocumentsYet: "No documents yet"
+messages.number: "Number"
+messages.searchPlaceholder: "Search documents..."
+messages.status: "Status"
+messages.total: "Total"
+messages.viewPDF: "View PDF"
+messages.year: "Year"
+
+=== Keys in Bulgarian but missing in English ===
+
+=== Summary ===
+Missing in Bulgarian: 25 keys
+Extra in Bulgarian: 0 keys
