@@ -1,6 +1,6 @@
 {
   "name": "fatturare",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Bulgarian VAT-compliant invoicing application for macOS",
   "main": "main/main.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "dev-renderer": "vite --host",
     "build-css": "npx tailwindcss -i ./renderer/index.css -o ./renderer/output.css --minify",
     "watch-css": "npx tailwindcss -i ./renderer/index.css -o ./renderer/output.css --watch",
-    "postinstall": "electron-builder install-app-deps",
+    "postinstall": "electron-rebuild install-app-deps",
     "reset-db": "node scripts/reset-db.js"
   },
   "keywords": [
@@ -25,13 +25,13 @@
   "author": "Open Source Contributor",
   "license": "GPL-3.0",
   "devDependencies": {
+    "@electron/rebuild": "^4.0.3",
     "@vitejs/plugin-react": "^5.1.2",
     "autoprefixer": "^10.4.23",
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
     "electron": "^28.3.3",
-    "electron-builder": "^24.0.0",
-    "electron-rebuild": "^3.2.9",
+    "electron-builder": "^26.8.1",
     "postcss": "^8.5.6",
     "vite": "^7.3.0"
   },
