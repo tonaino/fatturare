@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Banknote } from 'lucide-react';
 
 export const CreateInvoice = ({ editId, onComplete }) => {
   const { t } = useTranslation();
@@ -30,6 +31,9 @@ export const CreateInvoice = ({ editId, onComplete }) => {
   const [newProductPrice, setNewProductPrice] = useState('');
   const [newProductUnit, setNewProductUnit] = useState('pcs');
   const [showProductModal, setShowProductModal] = useState(false);
+  const [showVatCalculator, setShowVatCalculator] = useState(false);
+  const [currentVatItemIndex, setCurrentVatItemIndex] = useState(null);
+  const [grossPriceInput, setGrossPriceInput] = useState('');
 
   useEffect(() => {
     loadInitialData();
@@ -490,6 +494,28 @@ export const CreateInvoice = ({ editId, onComplete }) => {
     }
   };
 
+  const openVatCalculator = (index) => {
+    setCurrentVatItemIndex(index);
+    setGrossPriceInput('');
+    setShowVatCalculator(true);
+  };
+
+  const applyGrossPrice = () => {
+    if (currentVatItemIndex === null || grossPriceInput === '') return;
+
+    const grossPrice = parseFloat(grossPriceInput);
+    if (isNaN(grossPrice)) return;
+
+    const vatRate = parseFloat(formData.vat_rate) || 0;
+    const netPrice = grossPrice / (1 + (vatRate / 100));
+
+    handleItemChange(currentVatItemIndex, 'price', netPrice.toFixed(2));
+
+    setShowVatCalculator(false);
+    setCurrentVatItemIndex(null);
+    setGrossPriceInput('');
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -502,16 +528,16 @@ export const CreateInvoice = ({ editId, onComplete }) => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">
-          {editId ? (isFinalized ? `Edit Invoice ${docNumber}` : 'Edit Draft Invoice') : 'Create New Invoice'}
+          {editId ? (isFinalized ? t('invoices.editTitle', { docNumber }) : t('invoices.editDraftTitle')) : t('invoices.title')}
         </h1>
         {!editId && nextInvoiceNumber && (
           <div className="text-sm text-gray-500">
-            Next invoice number: <span className="font-medium text-gray-900">{nextInvoiceNumber}</span>
+            {t('invoices.nextInvoiceNumber')} <span className="font-medium text-gray-900">{nextInvoiceNumber}</span>
           </div>
         )}
         {editId && isFinalized && docNumber && (
           <div className="text-sm text-gray-500">
-            Invoice number: <span className="font-medium text-gray-900">{docNumber}</span>
+            {t('invoices.invoiceNumber')} <span className="font-medium text-gray-900">{docNumber}</span>
           </div>
         )}
       </div>
@@ -597,11 +623,11 @@ export const CreateInvoice = ({ editId, onComplete }) => {
 
           {/* Document Details Section */}
           <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Document Details</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-4">{t('invoices.documentDetails')}</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-                  Status
+                  {t('invoices.status')}
                 </label>
                 <div className="mt-1">
                   <select
@@ -611,16 +637,16 @@ export const CreateInvoice = ({ editId, onComplete }) => {
                     onChange={handleInputChange}
                     className="form-select block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                   >
-                    <option value="unpaid">Unpaid</option>
-                    <option value="paid">Paid</option>
-                    <option value="cancelled">Cancelled</option>
+                    <option value="unpaid">{t('documents.status.unpaid')}</option>
+                    <option value="paid">{t('documents.status.paid')}</option>
+                    <option value="cancelled">{t('documents.status.cancelled')}</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label htmlFor="vat_rate" className="block text-sm font-medium text-gray-700">
-                  VAT Rate (%)
+                  {t('invoices.vatRate')}
                 </label>
                 <div className="mt-1">
                   <select
@@ -641,7 +667,7 @@ export const CreateInvoice = ({ editId, onComplete }) => {
             {formData.vat_rate === 0 && (
               <div className="mt-4">
                 <label htmlFor="exemption_reason" className="block text-sm font-medium text-gray-700">
-                  Exemption Reason
+                  {t('invoices.exemptionReason')}
                 </label>
                 <div className="mt-1">
                   <select
@@ -652,11 +678,11 @@ export const CreateInvoice = ({ editId, onComplete }) => {
                     className="form-select block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                     required={formData.vat_rate === 0}
                   >
-                    <option value="">Select exemption reason</option>
-                    <option value="Art. 21, para. 2 VATA">Art. 21, para. 2 VATA - Intra-EU supply</option>
-                    <option value="Art. 22, para. 1 VATA">Art. 22, para. 1 VATA - Export outside EU</option>
-                    <option value="Art. 27, para. 1 VATA">Art. 27, para. 1 VATA - Services outside EU</option>
-                    <option value="Other">Other</option>
+                    <option value="">{t('invoices.selectExemptionReason')}</option>
+                    <option value="Art. 21, para. 2 VATA">{t('invoices.exemptionReasons.intraEU')}</option>
+                    <option value="Art. 22, para. 1 VATA">{t('invoices.exemptionReasons.export')}</option>
+                    <option value="Art. 27, para. 1 VATA">{t('invoices.exemptionReasons.outsideEU')}</option>
+                    <option value="Other">{t('invoices.exemptionReasons.other')}</option>
                   </select>
                 </div>
               </div>
@@ -665,7 +691,7 @@ export const CreateInvoice = ({ editId, onComplete }) => {
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div>
                 <label htmlFor="issue_date" className="block text-sm font-medium text-gray-700">
-                  Issue Date
+                  {t('invoices.issueDate')}
                 </label>
                 <div className="mt-1">
                   <input
@@ -682,7 +708,7 @@ export const CreateInvoice = ({ editId, onComplete }) => {
 
               <div>
                 <label htmlFor="tax_event_date" className="block text-sm font-medium text-gray-700">
-                  Tax Event Date
+                  {t('invoices.taxEventDate')}
                 </label>
                 <div className="mt-1">
                   <input
@@ -722,7 +748,7 @@ export const CreateInvoice = ({ editId, onComplete }) => {
                           value={item.name}
                           onChange={(e) => handleItemChange(index, 'name', e.target.value)}
                           className="form-input block w-full sm:text-sm"
-                          placeholder="Product name"
+                          placeholder={t('products.productName')}
                           list="products"
                         />
                         <datalist id="products">
@@ -758,14 +784,24 @@ export const CreateInvoice = ({ editId, onComplete }) => {
                         />
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <input
-                          type="number"
-                          value={item.price}
-                          onChange={(e) => handleItemChange(index, 'price', e.target.value)}
-                          className="form-input block w-full sm:text-sm"
-                          min="0"
-                          step="0.01"
-                        />
+                        <div className="relative flex items-center">
+                          <input
+                            type="number"
+                            value={item.price}
+                            onChange={(e) => handleItemChange(index, 'price', e.target.value)}
+                            className="form-input block w-full pr-8 sm:text-sm"
+                            min="0"
+                            step="0.01"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => openVatCalculator(index)}
+                            className="absolute right-2 p-1 text-gray-400 hover:text-blue-500"
+                            title={t('invoices.calculateFromGross')}
+                          >
+                            <Banknote size={16} />
+                          </button>
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
@@ -779,7 +815,7 @@ export const CreateInvoice = ({ editId, onComplete }) => {
                           className="text-red-600 hover:text-red-900"
                           disabled={items.length <= 1}
                         >
-                          Remove
+                          {t('invoices.remove')}
                         </button>
                       </td>
                     </tr>
@@ -794,42 +830,42 @@ export const CreateInvoice = ({ editId, onComplete }) => {
                 onClick={addNewItem}
                 className="btn-secondary inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
               >
-                Add Item
+                {t('invoices.addItem')}
               </button>
               <button
                 type="button"
                 onClick={() => setShowProductModal(true)}
                 className="btn-secondary ml-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
               >
-                Add New Product
+                {t('invoices.addNewProduct')}
               </button>
             </div>
           </div>
 
           {/* Legal Footnotes Section */}
           <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Legal Footnotes</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-4">{t('invoices.legalFootnotes')}</h3>
             <div className="text-sm text-gray-500">
-              VAT-exempt supplies under Art. 21, para. 2 VATA - Intra-EU supply
+              {t('invoices.exemptionReasons.intraEU')}
             </div>
           </div>
 
           {/* Totals */}
           <div className="mt-8 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-3">
             <div className="sm:col-span-1">
-              <label className="block text-sm font-medium text-gray-700">Total Net (EUR)</label>
+              <label className="block text-sm font-medium text-gray-700">{t('invoices.totalNet')}</label>
               <div className="mt-1 text-lg font-semibold text-gray-900">
                 {formData.total_net?.toLocaleString('en-US', { style: 'currency', currency: 'EUR' })}
               </div>
             </div>
             <div className="sm:col-span-1">
-              <label className="block text-sm font-medium text-gray-700">Total VAT (EUR)</label>
+              <label className="block text-sm font-medium text-gray-700">{t('invoices.totalVat')}</label>
               <div className="mt-1 text-lg font-semibold text-gray-900">
                 {formData.total_vat?.toLocaleString('en-US', { style: 'currency', currency: 'EUR' })}
               </div>
             </div>
             <div className="sm:col-span-1">
-              <label className="block text-sm font-medium text-gray-700">Total Gross (EUR)</label>
+              <label className="block text-sm font-medium text-gray-700">{t('invoices.totalGross')}</label>
               <div className="mt-1 text-lg font-semibold text-gray-900">
                 {formData.total_gross?.toLocaleString('en-US', { style: 'currency', currency: 'EUR' })}
               </div>
@@ -845,14 +881,14 @@ export const CreateInvoice = ({ editId, onComplete }) => {
                   onClick={handleSaveDraft}
                   className="btn-secondary inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
-                  Save as Draft
+                  {t('invoices.saveDraft')}
                 </button>
                 <button
                   type="button"
                   onClick={handleFinalize}
                   className="btn-primary inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
-                  Finalize Invoice
+                  {t('invoices.finalizeInvoice')}
                 </button>
               </div>
             ) : isFinalized ? (
@@ -861,7 +897,7 @@ export const CreateInvoice = ({ editId, onComplete }) => {
                 type="submit"
                 className="btn-primary inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                Update Invoice
+                {t('invoices.updateInvoice')}
               </button>
             ) : (
               /* Editing draft invoice - allow both save and finalize */
@@ -871,14 +907,14 @@ export const CreateInvoice = ({ editId, onComplete }) => {
                   onClick={handleSaveDraftWhenEditing}
                   className="btn-secondary inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
-                  Save as Draft
+                  {t('invoices.saveDraft')}
                 </button>
                 <button
                   type="button"
                   onClick={handleFinalizeWhenEditing}
                   className="btn-primary inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
-                  Finalize Invoice
+                  {t('invoices.finalizeInvoice')}
                 </button>
               </div>
             )}
@@ -900,12 +936,12 @@ export const CreateInvoice = ({ editId, onComplete }) => {
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
                   <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Add New Product</h3>
+                    <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">{t('invoices.addNewProduct')}</h3>
                     <form>
                       <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
                         <div className="sm:col-span-2">
                           <label htmlFor="newProductName" className="block text-sm font-medium text-gray-700">
-                            Product Name
+                            {t('products.name')}
                           </label>
                           <div className="mt-1">
                             <input
@@ -922,7 +958,7 @@ export const CreateInvoice = ({ editId, onComplete }) => {
 
                         <div>
                           <label htmlFor="newProductPrice" className="block text-sm font-medium text-gray-700">
-                            Default Price (EUR)
+                            {t('products.defaultPriceCurrency')}
                           </label>
                           <div className="mt-1">
                             <input
@@ -941,7 +977,7 @@ export const CreateInvoice = ({ editId, onComplete }) => {
 
                         <div>
                           <label htmlFor="newProductUnit" className="block text-sm font-medium text-gray-700">
-                            Unit
+                            {t('products.unit')}
                           </label>
                           <div className="mt-1">
                             <select
@@ -951,13 +987,13 @@ export const CreateInvoice = ({ editId, onComplete }) => {
                               onChange={(e) => setNewProductUnit(e.target.value)}
                               className="form-select block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                             >
-                              <option value="pcs">Pieces (pcs)</option>
-                              <option value="kg">Kilograms (kg)</option>
-                              <option value="m">Meters (m)</option>
-                              <option value="hours">Hours</option>
-                              <option value="unit">Unit</option>
-                              <option value="l">Liters (l)</option>
-                              <option value="other">Other</option>
+                              <option value="pcs">{t('units.pcs')}</option>
+                              <option value="kg">{t('units.kg')}</option>
+                              <option value="m">{t('units.m')}</option>
+                              <option value="hours">{t('units.hours')}</option>
+                              <option value="unit">{t('units.unit')}</option>
+                              <option value="l">{t('units.l')}</option>
+                              <option value="other">{t('units.other')}</option>
                             </select>
                           </div>
                         </div>
@@ -972,14 +1008,71 @@ export const CreateInvoice = ({ editId, onComplete }) => {
                   onClick={createProductAndAddToItem}
                   className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
                 >
-                  Add Product
+                  {t('invoices.addProductButton')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowProductModal(false)}
                   className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                 >
-                  Cancel
+                  {t('common.cancel')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* VAT Calculator Modal */}
+      {showVatCalculator && (
+        <div className="fixed z-20 inset-0 overflow-y-auto">
+          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 transition-opacity" aria-hidden="true" onClick={() => setShowVatCalculator(false)}>
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4 flex items-center">
+                  <Banknote className="mr-2" size={20} />
+                  {t('invoices.vatInclusiveCalculator')}
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="gross_price" className="block text-sm font-medium text-gray-700">
+                      {t('invoices.grossPrice')} ({formData.currency})
+                    </label>
+                    <div className="mt-1">
+                      <input
+                        type="number"
+                        id="gross_price"
+                        className="form-input block w-full sm:text-sm"
+                        value={grossPriceInput}
+                        onChange={(e) => setGrossPriceInput(e.target.value)}
+                        placeholder="0.00"
+                        autoFocus
+                        onKeyDown={(e) => e.key === 'Enter' && applyGrossPrice()}
+                      />
+                    </div>
+                    <p className="mt-2 text-xs text-gray-500">
+                      {t('invoices.vatRateUsed')}: {formData.vat_rate}%
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  onClick={applyGrossPrice}
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  {t('common.apply')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowVatCalculator(false)}
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  {t('common.cancel')}
                 </button>
               </div>
             </div>

@@ -169,7 +169,7 @@ export const Documents = ({ onEdit }) => {
   const handleGeneratePDF = async (docId) => {
     try {
       const pdfPath = await window.electronAPI.generatePDF(docId);
-      alert(`PDF regenerated successfully at: ${pdfPath}`);
+      alert(t('messages.pdfRegenerated', { pdfPath }));
       console.log('PDF path returned:', pdfPath);
       const refreshResult = await loadDocuments(); // Refresh to show updated PDF path
       console.log('Documents refreshed after PDF regeneration');
@@ -186,28 +186,28 @@ export const Documents = ({ onEdit }) => {
       loadDocuments();
     } catch (error) {
       console.error('Error updating status:', error);
-      alert('Error updating status');
+      alert(t('messages.errorUpdatingStatus'));
     }
   };
 
   const handleExportSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       const result = await window.electronAPI.exportMonthDocuments(
         exportFormData.month,
         exportFormData.year
       );
-      
+
       if (result.success) {
-        alert(`Documents exported successfully to: ${result.exportPath}`);
+        alert(t('messages.documentsExported', { exportPath: result.exportPath }));
         setShowExportModal(false);
       } else if (!result.canceled) {
-        alert(`Export failed: ${result.error}`);
+        alert(t('messages.exportFailed', { error: result.error }));
       }
     } catch (error) {
       console.error('Error exporting documents:', error);
-      alert('Error exporting documents');
+      alert(t('messages.errorExportingDocuments'));
     }
   };
 
@@ -249,7 +249,7 @@ export const Documents = ({ onEdit }) => {
     const selectedIds = Array.from(selectedDocuments);
 
     if (selectedIds.length === 0) {
-      alert('Please select at least one document to export.');
+      alert(t('messages.selectDocumentsToExport'));
       return;
     }
 
@@ -261,16 +261,16 @@ export const Documents = ({ onEdit }) => {
       );
 
       if (result.success) {
-        alert(`Documents exported successfully to: ${result.exportPath}`);
+        alert(t('messages.documentsExported', { exportPath: result.exportPath }));
         setShowExportModal(false);
         setSelectedDocuments(new Set());
         setMonthlyDocs([]);
       } else if (!result.canceled) {
-        alert(`Export failed: ${result.error}`);
+        alert(t('messages.exportFailed', { error: result.error }));
       }
     } catch (error) {
       console.error('Error exporting documents:', error);
-      alert('Error exporting documents');
+      alert(t('messages.errorExportingDocuments'));
     }
   };
 
@@ -380,14 +380,13 @@ export const Documents = ({ onEdit }) => {
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center space-x-2">
                                     <span className="text-sm font-medium text-gray-900">{doc.doc_number}</span>
-                                    <span className={`px-1.5 py-0.5 text-xs font-medium rounded ${
-                                      doc.type === 'CREDIT_NOTE' ? 'bg-purple-100 text-purple-800' :
+                                    <span className={`px-1.5 py-0.5 text-xs font-medium rounded ${doc.type === 'CREDIT_NOTE' ? 'bg-purple-100 text-purple-800' :
                                       doc.status === 'paid' ? 'bg-green-100 text-green-800' :
-                                      doc.status === 'unpaid' ? 'bg-amber-100 text-amber-800' :
-                                      doc.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                                      'bg-gray-100 text-gray-800'
-                                    }`}>
-                                      {doc.type === 'CREDIT_NOTE' ? 'Credit Note' : doc.status}
+                                        doc.status === 'unpaid' ? 'bg-amber-100 text-amber-800' :
+                                          doc.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                                            'bg-gray-100 text-gray-800'
+                                      }`}>
+                                      {doc.type === 'CREDIT_NOTE' ? t('documents.statusTypes.creditNote') : t(`documents.status.${doc.status}`) || doc.status}
                                     </span>
                                   </div>
                                   <div className="text-sm text-gray-500">
@@ -398,7 +397,7 @@ export const Documents = ({ onEdit }) => {
                             ))}
                           </div>
                         ) : (
-                          <p className="text-sm text-gray-500 py-4">No documents found for the selected month/year.</p>
+                          <p className="text-sm text-gray-500 py-4">{t('documents.noDocumentsForPeriod')}</p>
                         )}
                       </div>
                     </div>
@@ -433,7 +432,7 @@ export const Documents = ({ onEdit }) => {
             <div className="relative w-80">
               <input
                 type="text"
-                placeholder="Search documents..."
+                placeholder={t('documents.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="form-input block w-full pl-10 py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -447,19 +446,18 @@ export const Documents = ({ onEdit }) => {
 
             <div className="flex gap-2">
               {[
-                { key: 'paid', label: 'Paid', color: 'bg-green-100 text-green-800 hover:bg-green-200' },
-                { key: 'unpaid', label: 'Unpaid', color: 'bg-amber-100 text-amber-800 hover:bg-amber-200' },
-                { key: 'draft', label: 'Draft', color: 'bg-blue-100 text-blue-800 hover:bg-blue-200' },
-                { key: 'cancelled', label: 'Cancelled', color: 'bg-red-100 text-red-800 hover:bg-red-200' }
+                { key: 'paid', label: t('documents.status.paid'), color: 'bg-green-100 text-green-800 hover:bg-green-200' },
+                { key: 'unpaid', label: t('documents.status.unpaid'), color: 'bg-amber-100 text-amber-800 hover:bg-amber-200' },
+                { key: 'draft', label: t('documents.status.draft'), color: 'bg-blue-100 text-blue-800 hover:bg-blue-200' },
+                { key: 'cancelled', label: t('documents.status.cancelled'), color: 'bg-red-100 text-red-800 hover:bg-red-200' }
               ].map(({ key, label, color }) => (
                 <button
                   key={key}
                   onClick={() => setStatusFilters(prev => ({ ...prev, [key]: !prev[key] }))}
-                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                    statusFilters[key]
-                      ? `ring-2 ring-blue-500 ${color}`
-                      : `bg-gray-50 text-gray-700 hover:bg-gray-100`
-                  }`}
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium transition-colors ${statusFilters[key]
+                    ? `ring-2 ring-blue-500 ${color}`
+                    : `bg-gray-50 text-gray-700 hover:bg-gray-100`
+                    }`}
                 >
                   <svg
                     className={`w-4 h-4 mr-2 ${statusFilters[key] ? 'text-current' : 'hidden'}`}
@@ -476,18 +474,17 @@ export const Documents = ({ onEdit }) => {
 
             <div className="ml-auto flex gap-2">
               {[
-                { key: 'invoice', label: 'Invoice', color: 'bg-blue-100 text-blue-800 hover:bg-blue-200' },
-                { key: 'credit_note', label: 'Credit Note', color: 'bg-purple-100 text-purple-800 hover:bg-purple-200' },
-                { key: 'proforma_invoice', label: 'Proforma Invoice', color: 'bg-cyan-100 text-cyan-800 hover:bg-cyan-200' }
+                { key: 'invoice', label: t('customers.type.invoice'), color: 'bg-blue-100 text-blue-800 hover:bg-blue-200' },
+                { key: 'credit_note', label: t('customers.type.creditNote'), color: 'bg-purple-100 text-purple-800 hover:bg-purple-200' },
+                { key: 'proforma_invoice', label: t('customers.type.proformaInvoice'), color: 'bg-cyan-100 text-cyan-800 hover:bg-cyan-200' }
               ].map(({ key, label, color }) => (
                 <button
                   key={key}
                   onClick={() => setTypeFilters(prev => ({ ...prev, [key]: !prev[key] }))}
-                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                    typeFilters[key]
-                      ? `ring-2 ring-blue-500 ${color}`
-                      : `bg-gray-50 text-gray-700 hover:bg-gray-100`
-                  }`}
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium transition-colors ${typeFilters[key]
+                    ? `ring-2 ring-blue-500 ${color}`
+                    : `bg-gray-50 text-gray-700 hover:bg-gray-100`
+                    }`}
                 >
                   <svg
                     className={`w-4 h-4 mr-2 ${typeFilters[key] ? 'text-current' : 'hidden'}`}
@@ -512,7 +509,7 @@ export const Documents = ({ onEdit }) => {
                 }}
                 className="text-sm text-blue-600 hover:text-blue-800 underline"
               >
-                Clear
+                {t('documents.clear')}
               </button>
             )}
           </div>
@@ -534,21 +531,21 @@ export const Documents = ({ onEdit }) => {
                       <TableHeader>
                         <TableRow>
                           <TableHead className="cursor-pointer" onClick={() => handleSort('number')}>
-                            Number {sortBy === 'number' && (sortDirection === 'asc' ? '↑' : '↓')}
+                            {t('documents.number')} {sortBy === 'number' && (sortDirection === 'asc' ? '↑' : '↓')}
                           </TableHead>
                           <TableHead className="cursor-pointer" onClick={() => handleSort('date')}>
-                            Date {sortBy === 'date' && (sortDirection === 'asc' ? '↑' : '↓')}
+                            {t('documents.date')} {sortBy === 'date' && (sortDirection === 'asc' ? '↑' : '↓')}
                           </TableHead>
                           <TableHead className="cursor-pointer" onClick={() => handleSort('customer')}>
-                            Customer {sortBy === 'customer' && (sortDirection === 'asc' ? '↑' : '↓')}
+                            {t('documents.customer')} {sortBy === 'customer' && (sortDirection === 'asc' ? '↑' : '↓')}
                           </TableHead>
                           <TableHead className="cursor-pointer" onClick={() => handleSort('total')}>
-                            Total {sortBy === 'total' && (sortDirection === 'asc' ? '↑' : '↓')}
+                            {t('documents.total')} {sortBy === 'total' && (sortDirection === 'asc' ? '↑' : '↓')}
                           </TableHead>
                           <TableHead className="cursor-pointer" onClick={() => handleSort('status')}>
-                            Status {sortBy === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
+                            {t('documents.status_label')} {sortBy === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
                           </TableHead>
-                          <TableHead>Actions</TableHead>
+                          <TableHead>{t('documents.actions')}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -570,17 +567,14 @@ export const Documents = ({ onEdit }) => {
                               <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                 ${document.type === 'CREDIT_NOTE' ? 'bg-purple-100 text-purple-800' :
                                   document.type === 'PROFORMA_INVOICE' ? 'bg-blue-100 text-blue-800' :
-                                  document.status === 'paid' ? 'bg-green-100 text-green-800' :
-                                  document.status === 'unpaid' ? 'bg-amber-100 text-amber-800' :
-                                  document.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                                  'bg-gray-100 text-gray-800'}`}
+                                    document.status === 'paid' ? 'bg-green-100 text-green-800' :
+                                      document.status === 'unpaid' ? 'bg-amber-100 text-amber-800' :
+                                        document.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                                          'bg-gray-100 text-gray-800'}`}
                               >
-                                {document.type === 'CREDIT_NOTE' ? 'Credit Note' :
-                                 document.type === 'PROFORMA_INVOICE' ? 'Proforma Invoice' :
-                                 document.status === 'paid' ? 'Paid' :
-                                 document.status === 'unpaid' ? 'Unpaid' :
-                                 document.status === 'cancelled' ? 'Cancelled' :
-                                 document.status}
+                                {document.type === 'CREDIT_NOTE' ? t('documents.statusTypes.creditNote') :
+                                  document.type === 'PROFORMA_INVOICE' ? t('customers.type.proformaInvoice') :
+                                    t(`documents.status.${document.status}`) || document.status}
                               </span>
                             </TableCell>
                             <TableCell>
@@ -588,7 +582,7 @@ export const Documents = ({ onEdit }) => {
                                 <button
                                   onClick={() => onEdit(document.id, document.type)}
                                   className="text-indigo-600 hover:text-indigo-900 p-1 rounded tooltip"
-                                  title="Edit document"
+                                  title={t('documents.editDocument')}
                                 >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -598,7 +592,7 @@ export const Documents = ({ onEdit }) => {
                                   <button
                                     onClick={() => handleMarkAsPaid(document.id)}
                                     className="text-green-600 hover:text-green-900 p-1 rounded tooltip"
-                                    title="Mark as paid"
+                                    title={t('documents.markAsPaid')}
                                   >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
@@ -615,23 +609,23 @@ export const Documents = ({ onEdit }) => {
                                         } else {
                                           // If no PDF path, generate it first
                                           const pdfPath = await window.electronAPI.generatePDF(document.id);
-                                          alert(`PDF generated successfully at: ${pdfPath}`);
+                                          alert(t('messages.pdfGenerated', { pdfPath }));
                                           // Refresh data to get updated PDF path
                                           await loadDocuments();
                                         }
                                       } catch (error) {
                                         console.error('Error opening/generating PDF:', error);
-                                        alert('Error opening PDF: ' + error.message);
+                                        alert(t('messages.errorOpeningPdf', { error: error.message }));
                                       }
                                     }}
                                     className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-green-700 bg-green-100 hover:bg-green-200 tooltip"
-                                    title="View PDF"
+                                    title={t('documents.viewPDF')}
                                   >
                                     <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                     </svg>
-                                    View PDF
+                                    {t('documents.viewPDF')}
                                   </button>
                                 )}
                               </div>
@@ -676,9 +670,9 @@ export const Documents = ({ onEdit }) => {
                   <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                   </svg>
-                  <h3 className="mt-4 text-lg font-medium text-gray-900">No documents match your search</h3>
+                  <h3 className="mt-4 text-lg font-medium text-gray-900">{t('documents.noDocumentsMatchSearch')}</h3>
                   <p className="mt-2 text-sm text-gray-500 max-w-sm mx-auto">
-                    Try adjusting your search terms or clearing the filters to see more documents
+                    {t('documents.adjustSearch')}
                   </p>
                   <div className="mt-6">
                     <button
@@ -690,7 +684,7 @@ export const Documents = ({ onEdit }) => {
                       }}
                       className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     >
-                      Clear search & filters
+                      {t('documents.clearSearchFilters')}
                     </button>
                   </div>
                 </div>
@@ -701,9 +695,9 @@ export const Documents = ({ onEdit }) => {
                   <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                   </svg>
-                  <h3 className="mt-4 text-lg font-medium text-gray-900">No documents yet</h3>
+                  <h3 className="mt-4 text-lg font-medium text-gray-900">{t('documents.noDocumentsYet')}</h3>
                   <p className="mt-2 text-sm text-gray-500 max-w-sm mx-auto">
-                    Create invoices and credit notes to get started with your business paperwork
+                    {t('documents.createToGetStarted')}
                   </p>
                   <div className="mt-6">
                     <button
@@ -713,7 +707,7 @@ export const Documents = ({ onEdit }) => {
                       <svg className="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
                       </svg>
-                      Create Invoice
+                      {t('documents.createInvoice')}
                     </button>
                   </div>
                 </div>

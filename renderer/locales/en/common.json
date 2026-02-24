@@ -12,6 +12,16 @@
     "backup": "Backup",
     "exit": "Exit"
   },
+  "common": {
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "close": "Close",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "actions": "Actions",
+    "back": "Back"
+  },
   "settings": {
     "title": "Company Settings",
     "companyInfo": "Company Information",
@@ -45,6 +55,9 @@
     "actions": "Actions",
     "edit": "Edit",
     "delete": "Delete",
+    "close": "Close",
+    "apply": "Apply",
+    "na": "N/A",
     "deleteConfirm": "Are you sure you want to delete this bank account?",
     "noBankAccounts": "No bank accounts found. Add your first bank account using the \"Add Bank Account\" button.",
     "saveBankError": "Error saving bank account",
@@ -87,17 +100,21 @@
     "resetting": "Resetting...",
     "resetComplete": "Reset completed successfully. Application will restart.",
     "exportDatabaseError": "Error exporting database",
-    "enableResetDescription": "Enable the toggle to activate the reset button"
+    "enableResetDescription": "Enable the toggle to activate the reset button",
+    "resetError": "Error resetting: {{error}}"
   },
   "dashboard": {
     "title": "Dashboard",
     "totalOutstanding": "Total Outstanding",
-    "paidThisMonth": "Paid This Month",
+    "totalRevenue": "Paid This Month",
     "totalInvoices": "Invoices",
+    "paidThisMonth": "Paid This Month",
     "upcomingTaxDeadlines": "Upcoming Tax Deadlines",
     "recentActivity": "Recent Activity",
     "recentActivityDesc": "Latest invoices and credit notes created",
-    "noRecentActivity": "No recent activity to show. Start by creating your first invoice!"
+    "noRecentActivity": "No recent activity to show. Start by creating your first invoice!",
+    "unpaidInvoices": "Unpaid Invoices",
+    "totalUnpaid": "Total Unpaid"
   },
   "products": {
     "title": "Product Library",
@@ -111,12 +128,13 @@
     "defaultPriceCurrency": "Default Price (EUR)",
     "addProductButton": "Add Product",
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "noProductsYet": "No products yet",
+    "startAdding": "Create products to quickly add items to your invoices"
   },
   "customers": {
     "title": "Customers",
     "addCustomer": "Add Customer",
-    "editCustomer": "Edit Customer",
     "addNewCustomer": "Add New Customer",
     "customerName": "Customer Name",
     "accountablePerson": "Accountable Person (МОЛ)",
@@ -129,8 +147,25 @@
     "customerInvoices": "Customer Invoices",
     "type": {
       "invoice": "Invoice",
-      "creditNote": "Credit Note"
-    }
+      "creditNote": "Credit Note",
+      "proformaInvoice": "Proforma Invoice"
+    },
+    "filters": {
+      "bgOnly": "BG Only",
+      "bilingual": "Bilingual"
+    },
+    "noCustomersFound": "No customers found",
+    "noCustomersYet": "No customers yet",
+    "adjustSearch": "No customers match your search criteria. Try adjusting your search terms.",
+    "searchPlaceholder": "Search customers...",
+    "viewDetails": "View customer details",
+    "editCustomer": "Edit Customer",
+    "deleteCustomer": "Delete customer",
+    "confirmDelete": "Are you sure you want to delete this customer?",
+    "startAdding": "Start by adding your first customer to begin managing invoices and tracking payments",
+    "detailsTitle": "Customer Details: {{name}}",
+    "invoicesCount": "Customer Invoices ({{count}})",
+    "noInvoices": "No invoices found for this customer."
   },
   "invoices": {
     "title": "Create New Invoice",
@@ -149,6 +184,12 @@
     "defaultPriceCurrency": "Default Price (EUR)",
     "addProductButton": "Add Product",
     "exemptionReason": "Exemption Reason",
+    "exemptionReasons": {
+      "intraEU": "Art. 21, para. 2 VATA - Intra-EU supply",
+      "export": "Art. 22, para. 1 VATA - Export outside EU",
+      "outsideEU": "Art. 27, para. 1 VATA - Services outside EU",
+      "other": "Other"
+    },
     "issueDate": "Issue Date",
     "taxEventDate": "Tax Event Date",
     "finalizeInvoice": "Finalize Invoice",
@@ -169,7 +210,13 @@
     "actions": "Actions",
     "remove": "Remove",
     "saveDraft": "Save as Draft",
-    "updateDraft": "Save as Draft"
+    "updateDraft": "Save as Draft",
+    "calculateFromGross": "Calculate from gross price",
+    "vatInclusiveCalculator": "VAT-Inclusive Calculator",
+    "grossPrice": "Gross Price",
+    "vatRateUsed": "VAT Rate Used",
+    "nextInvoiceNumber": "Next invoice number: ",
+    "invoiceNumber": "Invoice number: "
   },
   "units": {
     "pcs": "Pieces (pcs)",
@@ -186,7 +233,6 @@
     "editTitle": "Edit Credit Note",
     "relatedInvoice": "Related Invoice (Optional)",
     "correctionReason": "Correction Reason",
-    "creditNoteItems": "Credit Note Items",
     "totalNet": "Total Net (EUR)",
     "totalGross": "Total Gross (EUR)",
     "addItem": "Add Item",
@@ -197,7 +243,17 @@
     "exemptionReason": "Exemption Reason",
     "issueDate": "Issue Date",
     "taxEventDate": "Tax Event Date",
-    "createCreditNote": "Create Credit Note"
+    "createCreditNote": "Create Credit Note",
+    "selectCorrectionReason": "Select correction reason",
+    "creditNoteItems": "Credit Note Items",
+    "reasons": {
+      "cancelled": "Cancelled invoice",
+      "price": "Price correction",
+      "quantity": "Quantity correction",
+      "return": "Product return",
+      "discount": "Discount",
+      "other": "Other"
+    }
   },
   "documents": {
     "monthNames": {
@@ -213,6 +269,20 @@
       "october": "October",
       "november": "November",
       "december": "December"
+    },
+    "proforma": {
+      "title": "Create New Proforma Invoice",
+      "editTitle": "Edit Proforma Invoice",
+      "editDraftTitle": "Edit Draft Proforma Invoice",
+      "nextNumber": "Next proforma invoice number: ",
+      "proformaNumber": "Proforma invoice number: ",
+      "convertToInvoice": "Convert to Real Invoice",
+      "status": {
+        "draft": "Draft",
+        "unpaid": "Unpaid",
+        "paid": "Paid",
+        "cancelled": "Cancelled"
+      }
     },
     "title": "Documents",
     "exportMonth": "Export Month",
@@ -235,7 +305,13 @@
     "date": "Date",
     "customer": "Customer",
     "total": "Total",
-    "status": "Status",
+    "status_label": "Status",
+    "status": {
+      "paid": "Paid",
+      "unpaid": "Unpaid",
+      "draft": "Draft",
+      "cancelled": "Cancelled"
+    },
     "actions": "Actions",
     "viewPDF": "View PDF",
     "editDocument": "Edit document",
@@ -246,6 +322,7 @@
     }
   },
   "messages": {
+    "unknownCustomer": "Unknown Customer",
     "backupCreated": "Backup created successfully: {{filePath}}",
     "backupFailed": "Backup failed: {{error}}",
     "selectExemptionReason": "Please select an exemption reason for 0% VAT rate",
@@ -289,31 +366,8 @@
     "errorConvertingProformaInvoice": "Error converting proforma invoice",
     "cannotConvertDraftToInvoice": "Draft proforma invoices cannot be converted. Please finalize the proforma first.",
     "confirmConvertProformaToInvoice": "Are you sure you want to convert this proforma invoice to a real invoice?",
-    "documentsTitle": "Documents",
-    "exportMonth": "Export Month",
     "exportDocumentsModalTitle": "Export Documents by Month",
-    "month": "Month",
-    "year": "Year",
-    "noDocumentsForPeriod": "No documents found for the selected month/year.",
-    "exportSelected": "Export Selected",
-    "cancel": "Cancel",
-    "searchPlaceholder": "Search documents...",
-    "clear": "Clear",
-    "noDocumentsMatchSearch": "No documents match your search",
-    "adjustSearch": "Try adjusting your search terms or clearing the filters to see more documents",
     "clearSearchFilters": "Clear search & filters",
-    "noDocumentsYet": "No documents yet",
-    "createToGetStarted": "Create invoices and credit notes to get started with your business paperwork",
-    "createInvoice": "Create Invoice",
-    "createProformaInvoice": "Create Proforma Invoice",
-    "number": "Number",
-    "date": "Date",
-    "customer": "Customer",
-    "total": "Total",
-    "status": "Status",
-    "actions": "Actions",
-    "viewPDF": "View PDF",
-    "editDocument": "Edit document",
-    "markAsPaid": "Mark as paid"
+    "createProformaInvoice": "Create Proforma Invoice"
   }
 }

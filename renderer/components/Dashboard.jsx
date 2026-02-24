@@ -52,11 +52,11 @@ export const Dashboard = () => {
           <p className="text-3xl font-bold text-gray-900">{stats.totalRevenue.toLocaleString('en-US', { style: 'currency', currency: 'EUR' })}</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-sm font-medium text-gray-500 mb-2">Неплатени фактури</h2>
+          <h2 className="text-sm font-medium text-gray-500 mb-2">{t('dashboard.unpaidInvoices')}</h2>
           <p className="text-3xl font-bold text-gray-900">{stats.unpaidInvoices}</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-sm font-medium text-gray-500 mb-2">Общо неплатени</h2>
+          <h2 className="text-sm font-medium text-gray-500 mb-2">{t('dashboard.totalUnpaid')}</h2>
           <p className="text-3xl font-bold text-gray-900">{stats.unpaidInvoicesTotal.toLocaleString('en-US', { style: 'currency', currency: 'EUR' })}</p>
         </div>
       </div>
@@ -73,7 +73,7 @@ export const Dashboard = () => {
                   <div>
                     <p className="text-sm font-medium text-gray-900">{invoice.doc_number}</p>
                     <p className="text-xs text-gray-500">
-                      {invoice.customer_name ? invoice.customer_name : 'Unknown Customer'} • {new Date(invoice.issue_date).toLocaleDateString()}
+                      {invoice.customer_name ? invoice.customer_name : t('messages.unknownCustomer')} • {new Date(invoice.issue_date).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="text-right">

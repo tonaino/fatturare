@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export const Customers = () => {
+  const { t } = useTranslation();
   const [customers, setCustomers] = useState([]);
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -61,14 +63,14 @@ export const Customers = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       if (editingCustomer) {
         await window.electronAPI.updateCustomer(editingCustomer.id, formData);
       } else {
         await window.electronAPI.createCustomer(formData);
       }
-      
+
       // Reset form and reload customers
       setFormData({
         name: '',
@@ -84,7 +86,7 @@ export const Customers = () => {
       loadCustomers();
     } catch (error) {
       console.error('Error saving customer:', error);
-      alert('Error saving customer');
+      alert(t('messages.errorSavingCustomer'));
     }
   };
 
@@ -103,13 +105,13 @@ export const Customers = () => {
   };
 
   const deleteCustomer = async (id) => {
-    if (window.confirm('Are you sure you want to delete this customer?')) {
+    if (window.confirm(t('customers.confirmDelete'))) {
       try {
         await window.electronAPI.deleteCustomer(id);
         loadCustomers();
       } catch (error) {
         console.error('Error deleting customer:', error);
-        alert('Error deleting customer');
+        alert(t('messages.errorDeletingCustomer'));
       }
     }
   };
@@ -125,7 +127,7 @@ export const Customers = () => {
       setShowViewModal(true);
     } catch (error) {
       console.error('Error loading customer invoices:', error);
-      alert('Error loading customer invoices');
+      alert(t('messages.errorLoadingCustomerInvoices'));
     }
   };
 
@@ -160,12 +162,12 @@ export const Customers = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('customers.title')}</h1>
         <button
           onClick={() => setShowForm(true)}
           className="btn-primary inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
-          Add Customer
+          {t('customers.addCustomer')}
         </button>
       </div>
 
@@ -173,7 +175,7 @@ export const Customers = () => {
         <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
           <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
             <h3 className="text-lg leading-6 font-medium text-gray-900">
-              {editingCustomer ? 'Edit Customer' : 'Add New Customer'}
+              {editingCustomer ? t('customers.editCustomer') : t('customers.addNewCustomer')}
             </h3>
           </div>
           <div className="px-4 py-5 sm:p-6">
@@ -181,7 +183,7 @@ export const Customers = () => {
               <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                 <div className="sm:col-span-6">
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                    Customer Name
+                    {t('customers.customerName')}
                   </label>
                   <div className="mt-1">
                     <input
@@ -198,7 +200,7 @@ export const Customers = () => {
 
                 <div className="sm:col-span-6">
                   <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-                    Address
+                    {t('settings.address')}
                   </label>
                   <div className="mt-1">
                     <textarea
@@ -214,7 +216,7 @@ export const Customers = () => {
 
                 <div className="sm:col-span-3">
                   <label htmlFor="bulstat" className="block text-sm font-medium text-gray-700">
-                    BULSTAT
+                    {t('settings.bulstat')}
                   </label>
                   <div className="mt-1">
                     <input
@@ -230,7 +232,7 @@ export const Customers = () => {
 
                 <div className="sm:col-span-3">
                   <label htmlFor="vat_id" className="block text-sm font-medium text-gray-700">
-                    VAT ID
+                    {t('settings.vatId')}
                   </label>
                   <div className="mt-1">
                     <input
@@ -246,7 +248,7 @@ export const Customers = () => {
 
                 <div className="sm:col-span-6">
                   <label htmlFor="mol" className="block text-sm font-medium text-gray-700">
-                    Accountable Person (МОЛ)
+                    {t('customers.accountablePerson')}
                   </label>
                   <div className="mt-1">
                     <input
@@ -262,7 +264,7 @@ export const Customers = () => {
 
                 <div className="sm:col-span-3">
                   <label htmlFor="default_template" className="block text-sm font-medium text-gray-700">
-                    Default Template
+                    {t('customers.defaultTemplate')}
                   </label>
                   <div className="mt-1">
                     <select
@@ -272,15 +274,15 @@ export const Customers = () => {
                       onChange={handleInputChange}
                       className="form-select block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                     >
-                      <option value="BG">BG Only</option>
-                      <option value="BILINGUAL">Bilingual</option>
+                      <option value="BG">{t('customers.filters.bgOnly')}</option>
+                      <option value="BILINGUAL">{t('customers.filters.bilingual')}</option>
                     </select>
                   </div>
                 </div>
 
                 <div className="sm:col-span-3">
                   <label htmlFor="default_currency" className="block text-sm font-medium text-gray-700">
-                    Default Currency
+                    {t('customers.defaultCurrency')}
                   </label>
                   <div className="mt-1">
                     <select
@@ -304,14 +306,14 @@ export const Customers = () => {
                   type="submit"
                   className="btn-primary inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
-                  {editingCustomer ? 'Update Customer' : 'Add Customer'}
+                  {editingCustomer ? t('customers.updateCustomer') : t('customers.addCustomer')}
                 </button>
                 <button
                   type="button"
                   onClick={cancelForm}
                   className="btn-secondary inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                 >
-                  Cancel
+                  {t('settings.cancel')}
                 </button>
               </div>
             </form>
@@ -324,7 +326,7 @@ export const Customers = () => {
           {customers.length > 0 && (
             <div className="mt-4 flex">
               <div className="flex-1 max-w-lg">
-                <label htmlFor="search" className="sr-only">Search customers</label>
+                <label htmlFor="search" className="sr-only">{t('customers.searchPlaceholder')}</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -336,7 +338,7 @@ export const Customers = () => {
                     name="search"
                     id="search"
                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Search customers..."
+                    placeholder={t('customers.searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
@@ -352,76 +354,78 @@ export const Customers = () => {
                 <table className="table min-w-full divide-y divide-gray-200">
                   <thead>
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">BULSTAT</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">VAT ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Template</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Currency</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('products.name')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('settings.bulstat')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('settings.vatId')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('customers.defaultTemplate')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('settings.currency')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('settings.actions')}</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredCustomers.map((customer) => (
-                    <tr key={customer.id} className="invoice-item-row">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{customer.name}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{customer.bulstat || '-'}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{customer.vat_id || '-'}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{customer.default_template}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{customer.default_currency || 'EUR'}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => viewCustomer(customer)}
-                            className="text-blue-600 hover:text-blue-900 p-1 rounded tooltip"
-                            title="View customer details"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                            </svg>
-                          </button>
-                          <button
-                            onClick={() => startEditing(customer)}
-                            className="text-indigo-600 hover:text-indigo-900 p-1 rounded tooltip"
-                            title="Edit customer"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                            </svg>
-                          </button>
-                          <button
-                            onClick={() => deleteCustomer(customer.id)}
-                            className="text-red-600 hover:text-red-900 p-1 rounded tooltip"
-                            title="Delete customer"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                      <tr key={customer.id} className="invoice-item-row">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{customer.name}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">{customer.bulstat || '-'}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">{customer.vat_id || '-'}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">
+                            {customer.default_template === 'BG' ? t('customers.filters.bgOnly') : t('customers.filters.bilingual')}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">{customer.default_currency || 'EUR'}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => viewCustomer(customer)}
+                              className="text-blue-600 hover:text-blue-900 p-1 rounded tooltip"
+                              title={t('customers.viewDetails')}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => startEditing(customer)}
+                              className="text-indigo-600 hover:text-indigo-900 p-1 rounded tooltip"
+                              title={t('customers.editCustomer')}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => deleteCustomer(customer.id)}
+                              className="text-red-600 hover:text-red-900 p-1 rounded tooltip"
+                              title={t('customers.deleteCustomer')}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
                     ))}
-                </tbody>
+                  </tbody>
                 </table>
               ) : (
                 <div className="text-center py-24">
                   <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                   </svg>
-                  <h3 className="mt-4 text-lg font-medium text-gray-900">No customers found</h3>
+                  <h3 className="mt-4 text-lg font-medium text-gray-900">{t('customers.noCustomersFound')}</h3>
                   <p className="mt-2 text-sm text-gray-500 max-w-sm mx-auto">
-                    No customers match your search criteria. Try adjusting your search terms.
+                    {t('customers.adjustSearch')}
                   </p>
                 </div>
               )}
@@ -431,9 +435,9 @@ export const Customers = () => {
               <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
               </svg>
-              <h3 className="mt-4 text-lg font-medium text-gray-900">No customers yet</h3>
+              <h3 className="mt-4 text-lg font-medium text-gray-900">{t('customers.noCustomersYet')}</h3>
               <p className="mt-2 text-sm text-gray-500 max-w-sm mx-auto">
-                Start by adding your first customer to begin managing invoices and tracking payments
+                {t('customers.startAdding')}
               </p>
               <div className="mt-6">
                 <button
@@ -443,7 +447,7 @@ export const Customers = () => {
                   <svg className="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
                   </svg>
-                  Add Customer
+                  {t('customers.addCustomer')}
                 </button>
               </div>
             </div>
@@ -465,38 +469,42 @@ export const Customers = () => {
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
                   <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Customer Details: {viewingCustomer.name}</h3>
+                    <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                      {t('customers.detailsTitle', { name: viewingCustomer.name })}
+                    </h3>
 
                     {/* Customer Information */}
                     <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                      <h4 className="text-md font-medium text-gray-900 mb-3">Customer Information</h4>
+                      <h4 className="text-md font-medium text-gray-900 mb-3">{t('customers.customerInformation')}</h4>
                       <div className="grid grid-cols-1 gap-y-3 gap-x-4 sm:grid-cols-2">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700">Name</label>
+                          <label className="block text-sm font-medium text-gray-700">{t('products.name')}</label>
                           <p className="mt-1 text-sm text-gray-900">{viewingCustomer.name}</p>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700">Address</label>
-                          <p className="mt-1 text-sm text-gray-900">{viewingCustomer.address || 'N/A'}</p>
+                          <label className="block text-sm font-medium text-gray-700">{t('settings.address')}</label>
+                          <p className="mt-1 text-sm text-gray-900">{viewingCustomer.address || t('settings.na')}</p>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700">BULSTAT</label>
-                          <p className="mt-1 text-sm text-gray-900">{viewingCustomer.bulstat || 'N/A'}</p>
+                          <label className="block text-sm font-medium text-gray-700">{t('settings.bulstat')}</label>
+                          <p className="mt-1 text-sm text-gray-900">{viewingCustomer.bulstat || t('settings.na')}</p>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700">VAT ID</label>
-                          <p className="mt-1 text-sm text-gray-900">{viewingCustomer.vat_id || 'N/A'}</p>
+                          <label className="block text-sm font-medium text-gray-700">{t('settings.vatId')}</label>
+                          <p className="mt-1 text-sm text-gray-900">{viewingCustomer.vat_id || t('settings.na')}</p>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700">Accountable Person (МОЛ)</label>
-                          <p className="mt-1 text-sm text-gray-900">{viewingCustomer.mol || 'N/A'}</p>
+                          <label className="block text-sm font-medium text-gray-700">{t('customers.accountablePerson')}</label>
+                          <p className="mt-1 text-sm text-gray-900">{viewingCustomer.mol || t('settings.na')}</p>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700">Default Template</label>
-                          <p className="mt-1 text-sm text-gray-900">{viewingCustomer.default_template || 'BG'}</p>
+                          <label className="block text-sm font-medium text-gray-700">{t('customers.defaultTemplate')}</label>
+                          <p className="mt-1 text-sm text-gray-900">
+                            {viewingCustomer.default_template === 'BG' ? t('customers.filters.bgOnly') : t('customers.filters.bilingual')}
+                          </p>
                         </div>
                         <div className="sm:col-span-2">
-                          <label className="block text-sm font-medium text-gray-700">Default Currency</label>
+                          <label className="block text-sm font-medium text-gray-700">{t('customers.defaultCurrency')}</label>
                           <p className="mt-1 text-sm text-gray-900">{viewingCustomer.default_currency || 'EUR'}</p>
                         </div>
                       </div>
@@ -504,18 +512,20 @@ export const Customers = () => {
 
                     {/* Customer Invoices */}
                     <div className="mt-6">
-                      <h4 className="text-md font-medium text-gray-900 mb-3">Customer Invoices ({customerInvoices.length})</h4>
+                      <h4 className="text-md font-medium text-gray-900 mb-3">
+                        {t('customers.invoicesCount', { count: customerInvoices.length })}
+                      </h4>
 
                       {customerInvoices.length > 0 ? (
                         <div className="overflow-x-auto">
                           <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
                             <thead className="bg-gray-50">
                               <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Number</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('documents.number')}</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('dashboard.totalInvoices')}</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('documents.date')}</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('documents.total')}</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('documents.status')}</th>
                               </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
@@ -526,9 +536,9 @@ export const Customers = () => {
                                   </td>
                                   <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm text-gray-500">
-                                      {invoice.type === 'INVOICE' ? 'Invoice' :
-                                       invoice.type === 'CREDIT_NOTE' ? 'Credit Note' :
-                                       'Proforma Invoice'}
+                                      {invoice.type === 'INVOICE' ? t('customers.type.invoice') :
+                                        invoice.type === 'CREDIT_NOTE' ? t('customers.type.creditNote') :
+                                          t('customers.type.proformaInvoice')}
                                     </div>
                                   </td>
                                   <td className="px-6 py-4 whitespace-nowrap">
@@ -543,7 +553,7 @@ export const Customers = () => {
                                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                       ${invoice.status === 'paid' ? 'bg-green-100 text-green-800' :
                                         invoice.status === 'unpaid' ? 'bg-yellow-100 text-yellow-800' :
-                                        'bg-red-100 text-red-800'}`}
+                                          'bg-red-100 text-red-800'}`}
                                     >
                                       {invoice.status}
                                     </span>
@@ -554,7 +564,7 @@ export const Customers = () => {
                           </table>
                         </div>
                       ) : (
-                        <p className="text-gray-500 text-center py-8">No invoices found for this customer.</p>
+                        <p className="text-gray-500 text-center py-8">{t('customers.noInvoices')}</p>
                       )}
                     </div>
                   </div>
@@ -567,7 +577,7 @@ export const Customers = () => {
                   onClick={closeViewModal}
                   className="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                 >
-                  Close
+                  {t('settings.close')}
                 </button>
               </div>
             </div>

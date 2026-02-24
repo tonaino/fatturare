@@ -38,16 +38,16 @@ export const Products = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       // Prepare data with proper number conversion
       const productData = {
         ...formData,
         default_price: parseFloat(formData.default_price) || 0
       };
-      
+
       await window.electronAPI.createProduct(productData);
-      
+
       // Reset form and reload products
       setFormData({
         name: '',
@@ -58,7 +58,7 @@ export const Products = () => {
       loadProducts();
     } catch (error) {
       console.error('Error saving product:', error);
-      alert('Error saving product');
+      alert(t('messages.errorSavingProduct'));
     }
   };
 
@@ -104,7 +104,7 @@ export const Products = () => {
               <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                 <div className="sm:col-span-6">
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                    Product Name
+                    {t('products.productName')}
                   </label>
                   <div className="mt-1">
                     <input
@@ -121,7 +121,7 @@ export const Products = () => {
 
                 <div className="sm:col-span-3">
                   <label htmlFor="default_price" className="block text-sm font-medium text-gray-700">
-                    Default Price (EUR)
+                    {t('products.defaultPriceCurrency')}
                   </label>
                   <div className="mt-1">
                     <input
@@ -140,7 +140,7 @@ export const Products = () => {
 
                 <div className="sm:col-span-3">
                   <label htmlFor="unit" className="block text-sm font-medium text-gray-700">
-                    Unit
+                    {t('products.unit')}
                   </label>
                   <div className="mt-1">
                     <select
@@ -150,13 +150,13 @@ export const Products = () => {
                       onChange={handleInputChange}
                       className="form-select block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                     >
-                      <option value="pcs">Pieces (pcs)</option>
-                      <option value="kg">Kilograms (kg)</option>
-                      <option value="m">Meters (m)</option>
-                      <option value="hours">Hours</option>
-                      <option value="unit">Unit</option>
-                      <option value="l">Liters (l)</option>
-                      <option value="other">Other</option>
+                      <option value="pcs">{t('units.pcs')}</option>
+                      <option value="kg">{t('units.kg')}</option>
+                      <option value="m">{t('units.m')}</option>
+                      <option value="hours">{t('units.hours')}</option>
+                      <option value="unit">{t('units.unit')}</option>
+                      <option value="l">{t('units.l')}</option>
+                      <option value="other">{t('units.other')}</option>
                     </select>
                   </div>
                 </div>
@@ -167,14 +167,14 @@ export const Products = () => {
                   type="submit"
                   className="btn-primary inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
-                  Add Product
+                  {t('products.addProduct')}
                 </button>
                 <button
                   type="button"
                   onClick={cancelForm}
                   className="btn-secondary inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                 >
-                  Cancel
+                  {t('settings.cancel')}
                 </button>
               </div>
             </form>
@@ -184,8 +184,8 @@ export const Products = () => {
 
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">Product Library</h3>
-          <p className="mt-1 text-sm text-gray-500">Manage your products and their default prices</p>
+          <h3 className="text-lg leading-6 font-medium text-gray-900">{t('products.title')}</h3>
+          <p className="mt-1 text-sm text-gray-500">{t('products.manageProductsDesc')}</p>
         </div>
         <div className="px-4 py-5 sm:p-6">
           {products.length > 0 ? (
@@ -193,9 +193,9 @@ export const Products = () => {
               <table className="table min-w-full divide-y divide-gray-200">
                 <thead>
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Default Price</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('products.name')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('products.defaultPrice')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('products.unit')}</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -208,7 +208,7 @@ export const Products = () => {
                         <div className="text-sm text-gray-500">{product.default_price?.toLocaleString('en-US', { style: 'currency', currency: 'EUR' })}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{product.unit}</div>
+                        <div className="text-sm text-gray-500">{t(`units.${product.unit}`)}</div>
                       </td>
                     </tr>
                   ))}
@@ -220,9 +220,9 @@ export const Products = () => {
               <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
               </svg>
-              <h3 className="mt-4 text-lg font-medium text-gray-900">No products yet</h3>
+              <h3 className="mt-4 text-lg font-medium text-gray-900">{t('products.noProductsYet')}</h3>
               <p className="mt-2 text-sm text-gray-500 max-w-sm mx-auto">
-                Create products to quickly add items to your invoices
+                {t('products.startAdding')}
               </p>
               <div className="mt-6">
                 <button
@@ -232,7 +232,7 @@ export const Products = () => {
                   <svg className="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
                   </svg>
-                  Add Product
+                  {t('products.addProduct')}
                 </button>
               </div>
             </div>

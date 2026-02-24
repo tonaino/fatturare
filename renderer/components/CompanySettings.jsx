@@ -280,11 +280,11 @@ export const CompanySettings = ({ companyInfo, setCompanyInfo }) => {
         alert(t('settings.resetComplete'));
         // App should restart, so this might not be reached
       } else {
-        alert('Error resetting: ' + result.error);
+        alert(t('settings.resetError', { error: result.error }));
       }
     } catch (error) {
       console.error('Reset error:', error);
-      alert('Error resetting: ' + error.message);
+      alert(t('settings.resetError', { error: error.message }));
     } finally {
       setResetting(false);
     }
