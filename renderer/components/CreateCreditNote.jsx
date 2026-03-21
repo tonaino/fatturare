@@ -165,6 +165,48 @@ export const CreateCreditNote = ({ editId, onComplete }) => {
     }));
   };
 
+  const handleDuplicate = async () => {
+    try {
+      let relatedInvoiceNumber = null;
+      let relatedInvoiceDate = null;
+
+      if (formData.related_invoice_id) {
+        const relatedInvoice = invoices.find(inv => inv.id === formData.related_invoice_id);
+        if (relatedInvoice) {
+          relatedInvoiceNumber = relatedInvoice.doc_number;
+          relatedInvoiceDate = relatedInvoice.issue_date;
+        }
+      }
+
+      const documentData = {
+        type: 'CREDIT_NOTE',
+        customer_id: formData.customer_id,
+        related_inv_number: relatedInvoiceNumber,
+        related_inv_date: relatedInvoiceDate,
+        issue_date: new Date().toISOString().split('T')[0],
+        tax_event_date: new Date().toISOString().split('T')[0],
+        status: 'unpaid',
+        vat_rate: formData.vat_rate,
+        exemption_reason: formData.vat_rate === 0 ? formData.exemption_reason : null,
+        correction_reason: formData.correction_reason,
+        total_net: formData.total_net,
+        total_vat: formData.total_vat,
+        total_gross: formData.total_gross,
+        pdf_path: null
+      };
+
+      documentData.doc_number = await window.electronAPI.getNextDocumentNumber('CREDIT_NOTE');
+      const itemsToDuplicate = items.map(({ id, ...rest }) => rest);
+      await window.electronAPI.createDocument(documentData, itemsToDuplicate);
+
+      alert(t('messages.documentDuplicated'));
+      if (onComplete) onComplete();
+    } catch (error) {
+      console.error('Error duplicating credit note:', error);
+      alert(t('messages.errorDuplicatingDocument'));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -617,13 +659,22 @@ export const CreateCreditNote = ({ editId, onComplete }) => {
               </div>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-6 flex space-x-4">
               <button
                 type="submit"
                 className="btn-primary inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 {editId ? t('invoices.updateInvoice') : t('creditNotes.createCreditNote')}
               </button>
+              {editId && (
+                <button
+                  type="button"
+                  onClick={handleDuplicate}
+                  className="btn-secondary inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  {t('common.duplicate')}
+                </button>
+              )}
             </div>
           </form>
         </div>

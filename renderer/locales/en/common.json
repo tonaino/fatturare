@@ -20,7 +20,8 @@
     "delete": "Delete",
     "edit": "Edit",
     "actions": "Actions",
-    "back": "Back"
+    "back": "Back",
+    "duplicate": "Duplicate"
   },
   "settings": {
     "title": "Company Settings",
@@ -368,6 +369,8 @@
     "confirmConvertProformaToInvoice": "Are you sure you want to convert this proforma invoice to a real invoice?",
     "exportDocumentsModalTitle": "Export Documents by Month",
     "clearSearchFilters": "Clear search & filters",
-    "createProformaInvoice": "Create Proforma Invoice"
+    "createProformaInvoice": "Create Proforma Invoice",
+    "documentDuplicated": "Document duplicated as draft!",
+    "errorDuplicatingDocument": "Error duplicating document"
   }
 }

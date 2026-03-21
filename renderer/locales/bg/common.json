@@ -20,7 +20,8 @@
     "delete": "Изтрий",
     "edit": "Редактирай",
     "actions": "Действия",
-    "back": "Назад"
+    "back": "Назад",
+    "duplicate": "Дублирай"
   },
   "settings": {
     "title": "Настройки на фирмата",
@@ -367,6 +368,8 @@
     "confirmConvertProformaToInvoice": "Сигурни ли сте, че искате да конвертирате тази проформа фактура в реална фактура?",
     "exportDocumentsModalTitle": "Експорт на документи по месец",
     "clearSearchFilters": "Изчисти търсенето и филтрите",
-    "createProformaInvoice": "Създай проформа фактура"
+    "createProformaInvoice": "Създай проформа фактура",
+    "documentDuplicated": "Документът е дублиран като чернова!",
+    "errorDuplicatingDocument": "Грешка при дублиране на документа"
   }
 }

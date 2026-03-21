@@ -444,6 +444,39 @@ export const CreateInvoice = ({ editId, onComplete }) => {
     }
   };
 
+  const handleDuplicate = async () => {
+    try {
+      const documentData = {
+        type: 'INVOICE',
+        customer_id: formData.customer_id,
+        currency: formData.currency,
+        bank_account_id: formData.bank_account_id || null,
+        related_inv_number: null,
+        related_inv_date: null,
+        issue_date: new Date().toISOString().split('T')[0],
+        tax_event_date: new Date().toISOString().split('T')[0],
+        status: 'draft',
+        vat_rate: formData.vat_rate,
+        exemption_reason: formData.vat_rate === 0 ? formData.exemption_reason : null,
+        correction_reason: null,
+        total_net: formData.total_net,
+        total_vat: formData.total_vat,
+        total_gross: formData.total_gross,
+        pdf_path: null
+      };
+
+      const itemsToDuplicate = items.map(({ id, ...rest }) => rest);
+
+      await window.electronAPI.createDocument(documentData, itemsToDuplicate);
+      alert(t('messages.documentDuplicated'));
+
+      if (onComplete) onComplete();
+    } catch (error) {
+      console.error('Error duplicating invoice:', error);
+      alert(t('messages.errorDuplicatingDocument'));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -892,13 +925,21 @@ export const CreateInvoice = ({ editId, onComplete }) => {
                 </button>
               </div>
             ) : isFinalized ? (
-              /* Editing finalized invoice */
-              <button
-                type="submit"
-                className="btn-primary inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                {t('invoices.updateInvoice')}
-              </button>
+              <div className="flex space-x-4">
+                <button
+                  type="submit"
+                  className="btn-primary inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  {t('invoices.updateInvoice')}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDuplicate}
+                  className="btn-secondary inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  {t('common.duplicate')}
+                </button>
+              </div>
             ) : (
               /* Editing draft invoice - allow both save and finalize */
               <div className="flex space-x-4">
@@ -915,6 +956,13 @@ export const CreateInvoice = ({ editId, onComplete }) => {
                   className="btn-primary inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   {t('invoices.finalizeInvoice')}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDuplicate}
+                  className="btn-secondary inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  {t('common.duplicate')}
                 </button>
               </div>
             )}
