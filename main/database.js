@@ -795,10 +795,13 @@ module.exports = {
     const docNumber = await getNextDocumentNumber(data.type);
     await incrementDocumentNumber(data.type);
 
-    // Set the status to unpaid for final documents
+    // Set the status to unpaid and use today's date for final documents
+    const today = new Date().toISOString().split('T')[0];
     data.status = 'unpaid';
     data.doc_number = docNumber;
-
+    data.issue_date = today;
+    data.tax_event_date = today;
+    
     const document = await createDocument(data, items);
 
     // Automatically generate PDFs (original and copy)
@@ -818,10 +821,13 @@ module.exports = {
     const docNumber = await getNextDocumentNumber(data.type);
     await incrementDocumentNumber(data.type);
 
-    // Set the status to unpaid for final documents and add doc_number
+    // Set the status to unpaid and use today's date for final documents
+    const today = new Date().toISOString().split('T')[0];
     data.status = 'unpaid';
     data.doc_number = docNumber;
-
+    data.issue_date = today;
+    data.tax_event_date = today;
+    
     const document = await updateDocument(id, data, items);
 
     // Automatically generate PDFs (original and copy)

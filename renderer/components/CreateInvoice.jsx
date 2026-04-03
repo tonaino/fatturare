@@ -60,13 +60,14 @@ export const CreateInvoice = ({ editId, onComplete }) => {
         setIsFinalized(!!doc.doc_number);
         setDocNumber(doc.doc_number || '');
 
+        const today = new Date().toISOString().split('T')[0];
         setFormData({
           customer_id: doc.customer_id || '',
           currency: doc.currency || 'EUR',
           bank_account_id: doc.bank_account_id || '',
           doc_number: doc.doc_number || '', // Include doc_number for finalized invoices
-          issue_date: doc.issue_date,
-          tax_event_date: doc.tax_event_date,
+          issue_date: doc.doc_number ? doc.issue_date : today,
+          tax_event_date: doc.doc_number ? doc.tax_event_date : today,
           status: doc.status,
           vat_rate: doc.vat_rate,
           exemption_reason: doc.exemption_reason || '',

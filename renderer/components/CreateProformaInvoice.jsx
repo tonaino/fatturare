@@ -60,13 +60,14 @@ export const CreateProformaInvoice = ({ editId, onComplete }) => {
         setIsFinalized(!!doc.doc_number);
         setDocNumber(doc.doc_number || '');
 
+        const today = new Date().toISOString().split('T')[0];
         setFormData({
           customer_id: doc.customer_id || '',
           currency: doc.currency || 'EUR',
           bank_account_id: doc.bank_account_id || '',
           doc_number: doc.doc_number || '', // Include doc_number for finalized invoices
-          issue_date: doc.issue_date,
-          tax_event_date: doc.tax_event_date,
+          issue_date: doc.doc_number ? doc.issue_date : today,
+          tax_event_date: doc.doc_number ? doc.tax_event_date : today,
           status: doc.status,
           vat_rate: doc.vat_rate,
           exemption_reason: doc.exemption_reason || '',
@@ -461,6 +462,7 @@ export const CreateProformaInvoice = ({ editId, onComplete }) => {
       const currentItems = await window.electronAPI.getDocumentItems(editId);
 
       // Create a new invoice with the same data
+      const today = new Date().toISOString().split('T')[0];
       const invoiceData = {
         type: 'INVOICE',
         customer_id: currentDoc.customer_id,
@@ -468,8 +470,8 @@ export const CreateProformaInvoice = ({ editId, onComplete }) => {
         bank_account_id: currentDoc.bank_account_id || null,
         related_inv_number: null,
         related_inv_date: null,
-        issue_date: currentDoc.issue_date,
-        tax_event_date: currentDoc.tax_event_date,
+        issue_date: today, // Always use today's date for converted invoices
+        tax_event_date: today,
         status: 'unpaid', // Start as unpaid
         vat_rate: currentDoc.vat_rate,
         exemption_reason: currentDoc.exemption_reason,
