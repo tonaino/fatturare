@@ -71,8 +71,7 @@
     "mac": {
       "category": "public.app-category.business",
       "target": [
-        "dmg",
-        "zip"
+        "dmg"
       ]
     }
   }
