@@ -807,6 +807,13 @@ export const CompanySettings = ({ companyInfo, setCompanyInfo }) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Version Info Footer */}
+      <div className="mt-12 py-6 border-t border-gray-200 text-center">
+        <p className="text-sm text-gray-400">
+          Fatturare v1.0.5
+        </p>
+      </div>
     </div>
   );
 };

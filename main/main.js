@@ -41,11 +41,36 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
+let mainWindow;
+let splashWindow;
+
+const createSplashWindow = () => {
+  splashWindow = new BrowserWindow({
+    width: 500,
+    height: 350,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  });
+
+  if (process.env.NODE_ENV === 'development') {
+    splashWindow.loadURL('http://localhost:5173/splash.html');
+  } else {
+    splashWindow.loadFile(path.join(__dirname, '../dist/renderer/splash.html'));
+  }
+};
+
 const createWindow = () => {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
+    show: false, // Hide initially to show after splash screen
+    icon: path.join(__dirname, '../assets/icon.png'),
     webPreferences: {
       preload: path.join(__dirname, '../preload.js'),
       nodeIntegration: false,
@@ -62,6 +87,16 @@ const createWindow = () => {
     mainWindow.loadFile(path.join(__dirname, '../dist/renderer/index.html'));
     // Keep DevTools closed in production.
   }
+
+  // Show main window and close splash screen when ready
+  mainWindow.once('ready-to-show', () => {
+    setTimeout(() => {
+      if (splashWindow) {
+        splashWindow.close();
+      }
+      mainWindow.show();
+    }, 2000); // 2 second delay for premium feel
+  });
 };
 
 // This method will be called when Electron has finished
@@ -71,6 +106,7 @@ app.on('ready', async () => {
   // Initialize database
   await initializeDatabase();
   
+  createSplashWindow();
   createWindow();
   
   // Register IPC handlers
@@ -128,6 +164,10 @@ app.on('ready', async () => {
 
   ipcMain.handle('quit-app', () => {
     app.quit();
+  });
+
+  ipcMain.handle('get-app-version', () => {
+    return app.getVersion();
   });
 
   // Reset everything handler

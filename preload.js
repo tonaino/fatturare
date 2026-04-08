@@ -53,5 +53,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   showDirectoryDialog: () => ipcRenderer.invoke('show-directory-dialog'),
 
   // App control
-  quitApp: () => ipcRenderer.invoke('quit-app')
+  quitApp: () => ipcRenderer.invoke('quit-app'),
+  getAppVersion: () => ipcRenderer.invoke('get-app-version')
 });
